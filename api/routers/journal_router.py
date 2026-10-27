@@ -13,7 +13,6 @@ from api.models.entry import (
     Entry,
     EntryCreate,
     EntryCreatedResponse,
-    EntryListResponse,
 )
 from api.repositories.interface_repository import DatabaseInterface
 from api.services.entry_service import EntryService
@@ -61,36 +60,13 @@ async def create_entry(
     return EntryCreatedResponse(detail="Entry created successfully", entry=created_entry)
 
 
-@router.get("/entries")
-async def get_all_entries(entry_service: EntryServiceDependency) -> EntryListResponse:
-    """Get all journal entries."""
-    result = await entry_service.get_all_entries()
-    return EntryListResponse(entries=result, count=len(result))
-
-
 @router.get("/entries/{entry_id}")
 async def get_entry(entry_id: str, entry_service: EntryServiceDependency) -> Entry:
     """Get a journal entry by ID."""
-    # TODO: Implement this endpoint to return a single journal entry by ID.
-    #
-    # Steps to implement:
-    # 1. Use await entry_service.get_entry(entry_id) to fetch the entry.
-    # 2. If entry is None, raise HTTPException with status_code=404.
-    # 3. Return the Entry model directly (not wrapped in a dict).
-    #
-    # Example response (status 200):
-    # {
-    #     "id": "uuid-string",
-    #     "work": "...",
-    #     "struggle": "...",
-    #     "intention": "...",
-    #     "created_at": "...",
-    #     "updated_at": "..."
-    # }
-    #
-    # Hint: Check the update_entry endpoint for similar patterns.
-    # See docs/04-get-entry.md for the exercise walkthrough.
-    raise HTTPException(status_code=501, detail="Not implemented - complete this endpoint!")
+    entry = await entry_service.get_entry(entry_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    return entry
 
 
 @router.patch("/entries/{entry_id}")
